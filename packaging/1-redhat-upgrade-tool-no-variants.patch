@@ -1,0 +1,42 @@
+--- redhat-upgrade-tool.py.orig	2023-12-18 12:27:36.000000000 +0200
++++ redhat-upgrade-tool.py	2023-12-20 09:08:46.522875724 +0200
+@@ -273,12 +273,10 @@ def main(args):
+     if args.nogpgcheck:
+         f._override_sigchecks = True
+     elif not f.instrepo.gpgcheck:
+-        # If instrepo is a Red Hat repo, add the gpg key and reload the repos
++        # If instrepo is a CentOS repo, add the gpg key and reload the repos
+         try:
+-            key = "product"
+-            if not f.treeinfo.has_section(key):
+-                key = "release"
+-            if f.treeinfo.get(key, 'name') == 'Red Hat Enterprise Linux':
++            key = "general"
++            if f.treeinfo.get(key, 'family') == 'CentOS':
+                 log.info("Reloading repos with GPG key")
+                 args.repos.append(('gpgkey', '%s=%s' % (f.instrepo.name, rhel_gpgkey_path)))
+                 f = setup_downloader(version=args.network,
+@@ -534,22 +534,10 @@ def check_preupg_risks():
+ 
+ def check_same_variant_upgrade(treeinfo):
+     distro = platform.linux_distribution()[0]
+-    if not distro.startswith("Red Hat Enterprise Linux "):
++    if distro not in ("CentOS"):
+         print _("Invalid distribution: %s") % distro
+         raise SystemExit(1)
+ 
+-    from_variant = distro[len('Red Hat Enterprise Linux '):]
+-    try:
+-        to_variant = treeinfo.get('general', 'variant')
+-    except NoOptionError:
+-        print _("Upgrade repository is not a Red Hat Enterprise Linux repository")
+-        raise SystemExit(1)
+-
+-    if from_variant != to_variant:
+-        print _("Upgrade requested from Red Hat Enterprise Linux %s to %s") % (from_variant, to_variant)
+-        print _("Upgrades between Red Hat Enterprise Linux variants is not supported.")
+-        raise SystemExit(1)
+-
+ 
+ if __name__ == '__main__':
+     args = parse_args()

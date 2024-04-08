@@ -3,18 +3,19 @@
 
 Name:           redhat-upgrade-tool
 Version:        0.8.0
-Release:        1%{?dist}
-Summary:        The Red Hat Enterprise Linux Upgrade tool
+Release:        2%{?dist}
+Summary:        The CentOS Linux Upgrade tool
 Epoch:          1
 
 License:        GPLv2+
 URL:            https://github.com/upgrades-migrations/redhat-upgrade-tool
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 Source1:        boom-%{version_boom}.tar.gz
+Patch1:         1-redhat-upgrade-tool-no-variants.patch
+Patch2:         2-redhat-upgrade-tool-remove-rhsm-downloads.patch
 
 Requires:       dbus
 Requires:       grubby
-Requires:       python-rhsm
 Requires:       python-argparse
 Requires:       preupgrade-assistant >= 2.2.0-1
 
@@ -32,14 +33,15 @@ BuildArch:      noarch
 Obsoletes:      preupgrade
 
 %description
-redhat-upgrade-tool is the Red Hat Enterprise Linux Upgrade tool.
+redhat-upgrade-tool is the CentOS Linux Upgrade tool.
 
 
 
 %prep
 %setup -q -n %{name}-%{version}
 %setup -q -T -D -a 1 -n %{name}-%{version}
-
+%patch1 -p0
+%patch2 -p0
 
 %build
 make PYTHON=%{__python}
@@ -93,6 +95,11 @@ if [ ! -e /var/lib/dbus/machine-id ]; then
     dbus-uuidgen > /var/lib/dbus/machine-id
 fi
 
+# CentOS branding
+ln -sf redhat-upgrade-tool $RPM_BUILD_ROOT/%{_bindir}/centos-upgrade-tool
+ln -sf centos-upgrade-tool $RPM_BUILD_ROOT/%{_bindir}/centos-upgrade-tool-cli
+ln -sf redhat-upgrade-tool.8 $RPM_BUILD_ROOT/%{_mandir}/man8/centos-upgrade-tool.8
+ln -sf centos-upgrade-tool.8 $RPM_BUILD_ROOT/%{_mandir}/man8/centos-upgrade-tool-cli.8
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -137,9 +144,10 @@ fi
 %config(noreplace) /boot/boom/boom.conf
 /boot/*
 
-
-
 %changelog
+* Tue Apr 2 2024 Yuriy Kohut <ykohut@almalinux.org> - 1:0.8.0-2
+- Add CentOS branding with patches: 1-redhat-upgrade-tool-no-variants.patch, 2-redhat-upgrade-tool-remove-rhsm-downloads.patch
+
 * Thu Sep 06 2018 Petr Stodulka <pstodulk@redhat.com> - 1:0.8.0-1
 - Add the rollback capability
   Resolves: rhbz#1625999
