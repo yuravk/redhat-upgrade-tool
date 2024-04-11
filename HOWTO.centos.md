@@ -123,9 +123,8 @@ CentOS7 repositories will be used to upgrade. So will need to import correct GPG
 > The `centos-upgrade-tool-cli` version *0.8.0* allows to upgrade to *CentOS release 7.2.1511*. The newer CentOS7 versions doesn't provide need data in the `.treeinfo` file, both at [repositories](https://vault.centos.org/7.2.1511/os/x86_64/.treeinfo) and on installation medias. The whole `checksums` part and `upgrade` parameter in `images-x86_64` part are missed.
 
 ```sh
-centos-upgrade-tool-cli --network=7 --force --cleanup-post --instrepo=http://vault.centos.org/7.2.1511/os/x86_64/
+centos-upgrade-tool-cli --network=7 --cleanup-post --instrepo=http://vault.centos.org/7.2.1511/os/x86_64/
 ```
-The `--force` option is to upgrade to CentOS 7.2 even current *Preupgrade Data* is for CentOS 7.9.
 
 The `--cleanup-post` option will do CentOS 6 packages removal if any are still remain installed (had no update candidate).
 
