@@ -22,9 +22,9 @@ The tool is to upgrade *CentOS release 6.10* into CentOS *Linux release 7.2.1511
 
 ```sh
 preupgrade-assistant-2.6.2-2.el6.noarch.rpm
-preupgrade-assistant-el6toel7-0.8.0-2.el6.noarch.rpm
+preupgrade-assistant-el6toel7-0.8.0-4.el6.noarch.rpm
 preupgrade-assistant-el6toel7-data-0.20200704-2.el6.noarch.rpm
-redhat-upgrade-tool-0.8.0-2.el6.noarch.rpm
+redhat-upgrade-tool-0.8.0-10.el6.noarch.rpm
 ```
 
 Additional available packages:
@@ -53,8 +53,25 @@ CentOS release 6.10 (Final)
 
 ### Add CentOS6 upgrade repository
 
+ - download the repository configuration file
 ```sh
-# yum install centos-upgrade-tool.repo
+# curl -o /etc/yum.repos.d/elevate-c6.repo https://repo.almalinux.org/elevate/testing/elevate-c6.repo
+```
+
+- or create the repository configuration file
+```sh
+# vi /etc/yum.repos.d/elevate-c6.repo
+
+[elevate-c6]
+name=ELevate for CentOS6
+baseurl=https://build.almalinux.org/pulp/content/copr/yuravk-elevate-c6-centos6-x86_64-dr/
+gpgkey=https://repo.almalinux.org/elevate/RPM-GPG-KEY-ELevate
+
+[elevate-c6-source]
+name=name=ELevate for CentOS6 - Source
+baseurl=https://build.almalinux.org/pulp/content/copr/yuravk-elevate-c6-centos6-src-dr/
+enabled=0
+gpgkey=https://repo.almalinux.org/elevate/RPM-GPG-KEY-ELevate
 ```
 
 ###  Install packages
@@ -68,8 +85,8 @@ That should install as minimum as the following packages:
 ```sh
 Installing:
 ...
- preupgrade-assistant-el6toel7      noarch  0.8.0-2.el6
- redhat-upgrade-tool                noarch  1:0.8.0-2.el6
+ preupgrade-assistant-el6toel7      noarch  0.8.0-4.el6
+ redhat-upgrade-tool                noarch  1:0.8.0-10.el6
 Installing for dependencies:
 ...
  preupgrade-assistant               noarch   2.6.2-2.el6
