@@ -34,6 +34,47 @@ preupgrade-assistant-tools-2.6.2-2.el6.noarch.rpm
 preupgrade-assistant-ui-2.6.2-2.el6.noarch.rpm
 ```
 
+## Get working CentOS6 repositories
+
+### Disable base, updates, extras, centosplus, contrib repositories:
+
+```sh
+# sed -i '/enabled=.*$/d;' /etc/yum.repos.d/CentOS-Base.repo
+# sed -i 's/gpgcheck=1/gpgcheck=1\nenabled=0/g' /etc/yum.repos.d/CentOS-Base.repo
+```
+
+### Add CentOS 6.10 Vault repositories:
+```sh
+# cat > /etc/yum.repos.d/CentOS6.10-Vault.repo
+[C6.10-base]
+name=CentOS-6.10 - Base
+baseurl=http://vault.centos.org/6.10/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+
+[C6.10-updates]
+name=CentOS-6.10 - Updates
+baseurl=http://vault.centos.org/6.10/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+
+[C6.10-extras]
+name=CentOS-6.10 - Extras
+baseurl=http://vault.centos.org/6.10/extras/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+
+[C6.10-contrib]
+name=CentOS-6.10 - Contrib
+baseurl=http://vault.centos.org/6.10/contrib/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=0
+```
+
 ## How to upgrade
 
 ### Make sure you are logged in as root user
