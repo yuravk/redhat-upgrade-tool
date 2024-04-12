@@ -75,7 +75,7 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 enabled=0
 ```
 
-## How to upgrade
+## Upgrade to *CentOS Linux release 7.2*
 
 ### Make sure you are logged in as root user
 
@@ -151,6 +151,34 @@ Read carefully generated /root/preupgrade/result.html to get to know whether you
 # lynx /root/preupgrade/result.html
 ```
 
+### How to mitigate of some risks and solve possible issues
+
+#### Check list of risks
+
+```sh
+# preupg --riskcheck --verbose
+```
+
+#### Risk for: *GNOME desktop environment*
+
+```log
+preupg.risk.EXTREME: You have the GNOME desktop environment session as an option in your X11 session manager. The GNOME desktop environment as a part of the 'Desktop' yum group underwent a serious redesign in its user interface as well as in underlying technologies in CentOS 7.
+```
+
+The issue can be solved with removing `gnome-session-xsession` package.
+```sh
+# yum remove gnome-session-xsession
+```
+Please remember to restore all removed packages on new CentOS7 system after the migration.
+
+#### Issue: Preserve `eth*` names for Network Interfaces (if applicable).
+
+Edit the `/boot/grub/grub.conf` default boot entry, and append existing kernel options with `biosdevname=0 net.ifnames=0`, like:
+
+```grub
+kernel /vmlinuz-2.6.32-754.35.1.el6.x86_64 ... rhgb quiet biosdevname=0 net.ifnames=0
+```
+
 ### Import CentOS 7 GPG key
 
 CentOS7 repositories will be used to upgrade. So will need to import correct GPG key:
@@ -199,7 +227,9 @@ S.5....T.  c /etc/yum.repos.d/CentOS-Base.repo
 # mv /etc/yum.repos.d/CentOS-Base.repo.rpmnew /etc/yum.repos.d/CentOS-Base.repo
 ```
 
-#### Get recent version
+## Upgrade to *CentOS Linux release 7.9*
+
+### Update whole system with yum
 
 Update CentOS7 to the most recent version:
 ```sh
