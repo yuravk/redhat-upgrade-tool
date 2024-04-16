@@ -43,7 +43,14 @@ preupgrade-assistant-ui-2.6.2-2.el6.noarch.rpm
 # sed -i 's/gpgcheck=1/gpgcheck=1\nenabled=0/g' /etc/yum.repos.d/CentOS-Base.repo
 ```
 
-### Add CentOS 6.10 Vault repositories:
+### CentOS 6.10 Vault repositories:
+
+- get the repositories config file
+```sh
+# curl -o /etc/yum.repos.d/centos6-vault.repo https://repo.almalinux.org/elevate/el6/centos6-vault.repo
+```
+
+- or create the repository config manually
 ```sh
 # cat > /etc/yum.repos.d/CentOS6.10-Vault.repo
 [C6.10-base]
@@ -94,25 +101,36 @@ CentOS release 6.10 (Final)
 
 ### Add CentOS6 upgrade repository
 
- - download the repository configuration file
+- add CentOS6 upgrade repository by installing package with the configuration file
+
 ```sh
-# curl -o /etc/yum.repos.d/elevate-c6.repo https://repo.almalinux.org/elevate/testing/elevate-c6.repo
+# yum install https://repo.almalinux.org/elevate/el6/x86_64/elevate-release-1.0-2.el6.noarch.rpm
+```
+
+ - or download the repository configuration file
+```sh
+# curl -o /etc/yum.repos.d/ELevate.repo https://repo.almalinux.org/elevate/el6/elevate.repo
 ```
 
 - or create the repository configuration file
 ```sh
-# vi /etc/yum.repos.d/elevate-c6.repo
-
-[elevate-c6]
-name=ELevate for CentOS6
-baseurl=https://build.almalinux.org/pulp/content/copr/yuravk-elevate-c6-centos6-x86_64-dr/
-gpgkey=https://repo.almalinux.org/elevate/RPM-GPG-KEY-ELevate
-
-[elevate-c6-source]
-name=name=ELevate for CentOS6 - Source
-baseurl=https://build.almalinux.org/pulp/content/copr/yuravk-elevate-c6-centos6-src-dr/
+# vi /etc/yum.repos.d/ELevate.repo
+[elevate]
+name=ELevate
+baseurl=https://repo.almalinux.org/elevate/el6/$basearch/
+gpgcheck=1
 enabled=0
-gpgkey=https://repo.almalinux.org/elevate/RPM-GPG-KEY-ELevate
+# disabled by redhat-upgrade-tool
+priority=90
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ELevate
+
+## Sources
+[elevate-source]
+name=name=ELevate - Source
+baseurl=https://repo.almalinux.org/elevate/el6/SRPMS/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ELevate
 ```
 
 ###  Install packages
@@ -189,13 +207,14 @@ CentOS7 repositories will be used to upgrade. So will need to import correct GPG
 
 ### Init the upgrade
 
-> The `centos-upgrade-tool-cli` version *0.8.0* allows to upgrade to *CentOS release 7.2.1511*. The newer CentOS7 versions doesn't provide need data in the `.treeinfo` file, both at [repositories](https://vault.centos.org/7.2.1511/os/x86_64/.treeinfo) and on installation medias. The whole `checksums` part and `upgrade` parameter in `images-x86_64` part are missed.
+> The `redhat-upgrade-tool` version *0.8.0* allows to upgrade to *CentOS release 7.2.1511*. The newer CentOS7 versions doesn't provide need data in the `.treeinfo` file, both at [repositories](https://vault.centos.org/7.2.1511/os/x86_64/.treeinfo) and on installation medias. The whole `checksums` part and `upgrade` parameter in `images-x86_64` part are missed.
 
 ```sh
-centos-upgrade-tool-cli --network=7 --cleanup-post --instrepo=http://vault.centos.org/7.2.1511/os/x86_64/
+redhat-upgrade-tool --network=7 --cleanup-post --instrepo=http://vault.centos.org/7.2.1511/os/x86_64/
 ```
 
-The `--cleanup-post` option will do CentOS 6 packages removal if any are still remain installed (had no update candidate).
+ - `--cleanup-post` option will do CentOS 6 packages removal if any are still remain installed (had no update candidate).
+ - `--network=RELEASEVER` Use online repos. `RELEASEVER` will be used to replace `$releasever` variable in any occur of repo URL.
 
 ### Reboot
 
@@ -217,7 +236,20 @@ CentOS Linux release 7.2.1511 (Core)
 
 #### Disable CentOS6 repositories
 
-If any, disable CentOS6 repositories. 
+If any, disable CentOS6 repositories.
+
+- remove CentOS6 upgrade repository package:
+```sh
+# yum remove elevate-release
+```
+- or delete the CentOS6 upgrade repository config
+```sh
+# rm /etc/yum.repos.d/ELevate.repo
+```
+- remove CentOS Vault repository config:
+```sh
+# rm /etc/yum.repos.d/centos6-vault.repo
+```
 
 #### Put back CentOS7 repository:
 
